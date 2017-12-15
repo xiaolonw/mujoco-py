@@ -129,12 +129,12 @@ def caching_compile(self, sources, output_dir=None, macros=None, include_dirs=No
         else:
             print('%s up to date, skipping.' % obj)
     return objects
-                
+
 
 def enable_compiler_caching(compiler):
     ''' Patch 'compile' in UnixCCompiler in order to ignore existing artifacts. '''
     if compiler.compiler_type == 'unix':
-        compiler.compile = types.MethodType(caching_compile, compiler) 
+        compiler.compile = types.MethodType(caching_compile, compiler)
 
 
 class custom_build_ext(build_ext):
@@ -227,11 +227,22 @@ class MujocoExtensionBuilder():
             ],
             libraries=['mujoco150'],
             library_dirs=[join(mjpro_path, 'bin')],
+            ## on yoda
             extra_compile_args=[
                 '-fopenmp',  # needed for OpenMP
                 '-w',  # suppress numpy compilation warnings
+                '-std=c11',
+                '-m64',
+                '-L /usr/lib64'
             ],
-            extra_link_args=['-fopenmp'],
+            extra_link_args=['-fopenmp', '-std=c11', '-m64', '-L/usr/lib64'],
+            ## on local machine
+            # extra_compile_args=[
+            #     '-fopenmp',  # needed for OpenMP
+            #     '-w',  # suppress numpy compilation warnings
+            #     '-std=c11',
+            # ],
+            # extra_link_args=['-fopenmp', '-std=c11'],
             language='c')
 
     def build(self):
